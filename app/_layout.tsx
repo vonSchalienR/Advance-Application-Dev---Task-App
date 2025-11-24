@@ -1,6 +1,7 @@
 
-// mulla ei toimi ilman tätä, sekä se näyttää hiukan erilaiselta tottakai sen takia. 
-// Kokeile sä toimiiko sulla sillä vanhalla eli tällä
+// mulla ei toimi ilman GPT:n antamaa koodia, sekä se näyttää hiukan erilaiselta tottakai sen takia. 
+
+// Kokeile sä toimiiko sulla sillä vanhalla eli tällä mikä on tämän alla
 
 /*import { Stack, useRouter } from "expo-router"; 
 import { useEffect } from "react"; function RouteGuard({ children }: { children: React.ReactNode }) { const router = useRouter(); const isAuth = false; useEffect(() => { if (!isAuth) { router.replace("/auth"); } }); return <>{children}</> }
