@@ -1,16 +1,36 @@
+/* ORIGINAL CODE FROM THE TUTORIAL, NOT WORKING FOR SOME REASON
 
-// mulla ei toimi ilman GPT:n antamaa koodia, sekä se näyttää hiukan erilaiselta tottakai sen takia. 
+import { Stack, useRouter } from "expo-router"; 
+import { useEffect } from "react";
 
-// Kokeile sä toimiiko sulla sillä vanhalla eli tällä mikä on tämän alla
+function RouteGuard({ children }: { children: React.ReactNode }) {
+   const router = useRouter();
+   const isAuth = false;
+   
+   useEffect(() => {
+      if (!isAuth) {
+         router.replace("/auth");
+      }
+   });
+   
+   return <>{children}</>
+}
 
-/*import { Stack, useRouter } from "expo-router"; 
-import { useEffect } from "react"; function RouteGuard({ children }: { children: React.ReactNode }) { const router = useRouter(); const isAuth = false; useEffect(() => { if (!isAuth) { router.replace("/auth"); } }); return <>{children}</> }
-export default function RootLayout() { return ( <RouteGuard> <Stack> <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> </Stack> </RouteGuard> ); } 
-*/
+export default function RootLayout() {
+   return (
+   <RouteGuard>
+      <Stack>
+         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+         </Stack>
+         </RouteGuard>
+         );
+      } 
+
+ORIGINAL CODE FROM THE TUTORIAL, NOT WORKING FOR SOME REASON */ 
 
 
 
-//GPT ANTAMA KOODI:
+// CODE FROM CHATGPT, WORKS BUT NEEDS SOME FIXES
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -40,3 +60,7 @@ const isAuth = false; // vaihda oikeaan tarkistukseen
  );
 
 } 
+
+// CODE FROM CHATGPT, WORKS BUT NEEDS SOME FIXES
+
+
