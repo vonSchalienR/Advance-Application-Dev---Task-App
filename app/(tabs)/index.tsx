@@ -6,10 +6,6 @@ export default function Index() {
   return (
     <View style={styles.view}>
       <Text>Welcome to the task app. Slay.</Text>
-      <Link href="/login" style={styles.navButton}>
-      {" "}
-      Login Page
-      </Link>
     </View>
   );
 }
