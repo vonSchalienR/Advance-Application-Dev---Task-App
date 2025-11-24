@@ -4,15 +4,12 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-      <Link href="/login"> Login Page </Link>
+    <View style={styles.view}>
+      <Text>Welcome to the task app. Slay.</Text>
+      <Link href="/login" style={styles.navButton}>
+      {" "}
+      Login Page
+      </Link>
     </View>
   );
 }
@@ -22,8 +19,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-      }
-
-  }
-
-)
+      },
+    navButton: {
+      width: 100,
+      height: 20,
+      backgroundColor: "blue",
+      borderRadius: "10",
+      textAlign: "center",
+    }
+  });
