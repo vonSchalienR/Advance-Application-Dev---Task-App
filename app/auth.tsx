@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 
 import { Button, Text, TextInput, useTheme } from 'react-native-paper';
 
+
 export default function AuthScreen() {
     const[isSignUp, setIsSignUp] = useState<boolean>(false);
     const[email, setEmail] = useState<string>("")
@@ -12,7 +13,8 @@ export default function AuthScreen() {
     const[error, setError] = useState<string | null>("")
 
 
-     const theme = useTheme()
+     const theme = useTheme();
+
      
 
 

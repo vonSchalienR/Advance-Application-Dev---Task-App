@@ -30,37 +30,24 @@ ORIGINAL CODE FROM THE TUTORIAL, NOT WORKING FOR SOME REASON */
 
 
 
-// CODE FROM CHATGPT, WORKS BUT NEEDS SOME FIXES
+// CODE FROM CHATGPT, WORKS NOW
+
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
-
-const isAuth = false; // vaihda oikeaan tarkistukseen
-
   return (
+   // <AuthProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        {/* tänne myöhemmin esim. auth-näkymä erikseen jos haluat */}
+        {/* <Stack.Screen name="auth" /> */}
+      </Stack>
+    // <AuthProvider>
+  );
+}
 
-    <Stack>
 
- {isAuth ? (
 
-    // pääsovelluksen välilehdet
-
-    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-     ) : (
-
-        // kirjautumisnäkymä
-
-       <Stack.Screen name="auth" options={{ headerShown: false }} />
-
-       )}
-
-    </Stack>
-
- );
-
-} 
-
-// CODE FROM CHATGPT, WORKS BUT NEEDS SOME FIXES
+// CODE FROM CHATGPT, WORKS NOW
 
 
