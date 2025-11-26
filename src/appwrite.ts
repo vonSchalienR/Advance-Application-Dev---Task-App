@@ -7,6 +7,6 @@ export const client = new Client()
 export const account = new Account(client);
 export const databases = new Databases(client);
 
-export const DB_ID = "692736420010c90e202c"; // vaihda oman Appwrite-tietokannan ID
+export const DB_ID = "692736420010c90e202c"; 
 export const TASK_COLLECTION = "tasks";
 export const COMPLETIONS_COLLECTION = "completions";

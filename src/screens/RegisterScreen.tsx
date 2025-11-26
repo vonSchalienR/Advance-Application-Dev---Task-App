@@ -54,7 +54,7 @@ export default function RegisterScreen({ navigation }: any) {
         style={{
           marginTop: 20,
           textAlign: "center",
-          color: "blue",
+          color: "#ff7058",
         }}
         onPress={() => navigation.navigate("Login")}
       >

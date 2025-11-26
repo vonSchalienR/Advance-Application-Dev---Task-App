@@ -7,13 +7,11 @@ import React, {
 } from "react";
 import { account } from "../appwrite";
 
-// Appwrite user type (safe)
 type AppwriteUser = {
   $id: string;
   email: string;
 } | null;
 
-// This is the shape of our context:
 type AuthContextType = {
   user: AppwriteUser;
   loading: boolean;
@@ -22,7 +20,6 @@ type AuthContextType = {
   logout: () => Promise<void>;
 };
 
-// Create context with safe default:
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
@@ -31,7 +28,6 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-// Provider props type
 type AuthProviderProps = {
   children: ReactNode;
 };
@@ -85,5 +81,4 @@ useEffect(() => {
   );
 };
 
-// Custom hook:
 export const useAuth = () => useContext(AuthContext);

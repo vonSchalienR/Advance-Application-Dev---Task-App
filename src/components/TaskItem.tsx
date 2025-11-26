@@ -8,7 +8,7 @@ import {
 } from "../appwrite";
 import { Button } from "react-native-paper";
 
-// Määritellään task-tyyppi
+
 type Task = {
   $id: string;
   title: string;
@@ -17,7 +17,7 @@ type Task = {
   userId?: string;
 };
 
-// Props-tyyppi
+
 type Props = {
   task: Task;
   refresh: () => void;

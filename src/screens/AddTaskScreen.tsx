@@ -7,7 +7,6 @@ import { useAuth } from "../contexts/AuthContext";
 export default function AddTaskScreen() {
   const { user } = useAuth();
 
-  // If user isn't loaded yet, you can guard:
   if (!user) return null;
 
   const [title, setTitle] = useState("");
@@ -20,10 +19,9 @@ export default function AddTaskScreen() {
         title,
         dueDate,
         priority,
-        userId: user.$id,  // <-- now safe
+        userId: user.$id,  
       });
 
-      // Clear fields after saving
       setTitle("");
       setDueDate("");
       setPriority("low");
