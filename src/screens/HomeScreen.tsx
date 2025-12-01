@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { databases, DB_ID, TASK_COLLECTION } from "../appwrite";
 import { useAuth } from "../contexts/AuthContext";
 import { Query } from "appwrite";
 import TaskItem from "../components/TaskItem";
+import { styles, colors, spacing } from "../styles";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Task = {
   $id: string;
   title: string;
   dueDate: string;
-  priority?: string;
+  priority: string;
   userId: string;
 };
 
@@ -19,9 +21,11 @@ export default function HomeScreen() {
 
   const load = async () => {
     if (!user) return;
+
     const res: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
       Query.equal("userId", user.$id),
     ]);
+
     setTasks(res.documents ?? []);
   };
 
@@ -30,7 +34,14 @@ export default function HomeScreen() {
   }, [user]);
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
+    <View style={styles.container}>
+      {/* HEADER */}
+      <Text style={styles.title}>Today’s Tasks</Text>
+      <Text style={styles.subtitle}>
+        {tasks.length} task{tasks.length !== 1 ? "s" : ""} waiting for you
+      </Text>
+
+      {/* LIST */}
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.$id}
@@ -38,9 +49,46 @@ export default function HomeScreen() {
           <TaskItem task={item} refresh={load} />
         )}
         ListEmptyComponent={
-          <Text style={{ marginTop: 20 }}>No tasks for today.</Text>
+          <View style={{ marginTop: spacing.xl }}>
+            <Text style={[styles.subtitle, { textAlign: "center" }]}>
+              No tasks yet
+            </Text>
+            <Text
+              style={{
+                textAlign: "center",
+                color: colors.textSecondary,
+                marginTop: 8,
+              }}
+            >
+              Tap the + button to add your first task
+            </Text>
+          </View>
         }
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
+
+      {/* FLOATING ADD BUTTON */}
+      <TouchableOpacity
+        onPress={() => console.log("Open add task screen")}
+        style={{
+          position: "absolute",
+          bottom: 30,
+          right: 30,
+          backgroundColor: colors.primary,
+          width: 60,
+          height: 60,
+          borderRadius: 30,
+          justifyContent: "center",
+          alignItems: "center",
+          shadowColor: "#000",
+          shadowOpacity: 0.3,
+          shadowOffset: { width: 0, height: 4 },
+          shadowRadius: 8,
+          elevation: 6,
+        }}
+      >
+        <MaterialIcons name="add" size={32} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }

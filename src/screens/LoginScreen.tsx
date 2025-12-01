@@ -1,82 +1,89 @@
 import { useState } from "react";
-import { View, Image, StyleSheet } from "react-native";
-import { TextInput, Button, Text } from "react-native-paper";
+import { View, TouchableOpacity } from "react-native";
+import { TextInput, Button, Text, Card } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext";
+import { styles, colors, spacing, radius } from "../styles";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function LoginScreen({ navigation }: any) {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const onLogin = async () => {
+    try {
+      await login(email, password);
+    } catch (err: any) {
+      alert(err.message || "Login failed");
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      {}
-      <Image
-        source={require("../../assets/todoicon.png")}  
-        style={styles.logo}
-        resizeMode="contain"
-      />
-
-      {}
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        mode="outlined"
-        style={styles.input}
-      />
-      <TextInput
-        label="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        mode="outlined"
-        style={styles.input}
-      />
-
-      <Button
-        mode="contained"
-        onPress={() => login(email, password)}
-        style={styles.button}
-        contentStyle={{ height: 50 }}
-      >
-        Login
-      </Button>
-
-      <Text
-        style={styles.registerText}
-        onPress={() => navigation.navigate("Register")}
-      >
-        Don't have an account? Register
+    <View style={[styles.container, { justifyContent: "center" }]}>
+      
+      {/* HERO TITLE */}
+      <Text style={[styles.title, { textAlign: "center", marginBottom: spacing.lg }]}>
+        Welcome Back
       </Text>
+      <Text
+        style={{
+          textAlign: "center",
+          color: colors.textSecondary,
+          marginBottom: spacing.lg,
+        }}
+      >
+        Login to continue managing your tasks
+      </Text>
+
+      {/* LOGIN CARD */}
+      <Card style={[styles.elevatedCard, { padding: spacing.lg }]}>
+        {/* Email */}
+        <TextInput
+          mode="outlined"
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          left={<TextInput.Icon icon="email" />}
+          style={{ marginBottom: spacing.md }}
+        />
+
+        {/* Password */}
+        <TextInput
+          mode="outlined"
+          label="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+          left={<TextInput.Icon icon="lock" />}
+        />
+
+        {/* LOGIN BUTTON */}
+        <Button
+          mode="contained"
+          onPress={onLogin}
+          style={{
+            marginTop: spacing.lg,
+            padding: spacing.sm,
+            borderRadius: radius.lg,
+          }}
+        >
+          Login
+        </Button>
+
+        {/* NAVIGATE TO REGISTER */}
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+          <Text
+            style={{
+              marginTop: spacing.lg,
+              textAlign: "center",
+              color: colors.primary,
+              fontWeight: "600",
+            }}
+          >
+            Don't have an account? Register
+          </Text>
+        </TouchableOpacity>
+      </Card>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    alignSelf: "center",
-    marginBottom: 40,
-  },
-  input: {
-    marginBottom: 16,
-  },
-  button: {
-    marginTop: 10,
-    borderRadius: 8,
-  },
-  registerText: {
-    marginTop: 20,
-    textAlign: "center",
-    color: "#ff7058",
-    textDecorationLine: "underline",
-  },
-});

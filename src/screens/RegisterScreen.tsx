@@ -1,65 +1,90 @@
 import { useState } from "react";
-import { View } from "react-native";
-import { TextInput, Button, Text } from "react-native-paper";
+import { View, TouchableOpacity } from "react-native";
+import { TextInput, Button, Text, Card } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext";
-import { styles } from "../styles";
+import { styles, colors, spacing, radius } from "../styles";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function RegisterScreen({ navigation }: any) {
   const { signup } = useAuth();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async () => {
+  const onRegister = async () => {
     try {
       await signup(email, password);
       navigation.navigate("Login");
     } catch (err: any) {
-      console.error(err);
       alert(err.message || "Registration failed");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 26, marginBottom: 20, fontWeight: "bold" }}>
+    <View style={[styles.container, { justifyContent: "center" }]}>
+      
+      {/* HERO TITLE */}
+      <Text style={[styles.title, { textAlign: "center", marginBottom: spacing.lg }]}>
         Create Account
       </Text>
-
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        style={{ marginBottom: 15 }}
-      />
-
-      <TextInput
-        label="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-        style={{ marginBottom: 15 }}
-      />
-
-      <Button
-        mode="contained"
-        onPress={handleRegister}
-        style={{ marginTop: 10 }}
-      >
-        Sign Up
-      </Button>
-
       <Text
         style={{
-          marginTop: 20,
           textAlign: "center",
-          color: "#ff7058",
+          color: colors.textSecondary,
+          marginBottom: spacing.lg,
         }}
-        onPress={() => navigation.navigate("Login")}
       >
-        Already have an account? Login
+        Join us and start tracking your tasks
       </Text>
+
+      {/* REGISTER CARD */}
+      <Card style={[styles.elevatedCard, { padding: spacing.lg }]}>
+        {/* Email */}
+        <TextInput
+          mode="outlined"
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          left={<TextInput.Icon icon="email" />}
+          style={{ marginBottom: spacing.md }}
+        />
+
+        {/* Password */}
+        <TextInput
+          mode="outlined"
+          label="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          left={<TextInput.Icon icon="lock" />}
+        />
+
+        {/* REGISTER BUTTON */}
+        <Button
+          mode="contained"
+          onPress={onRegister}
+          style={{
+            marginTop: spacing.lg,
+            padding: spacing.sm,
+            borderRadius: radius.lg,
+          }}
+        >
+          Register
+        </Button>
+
+        {/* NAVIGATE BACK TO LOGIN */}
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <Text
+            style={{
+              marginTop: spacing.lg,
+              textAlign: "center",
+              color: colors.primary,
+              fontWeight: "600",
+            }}
+          >
+            Already have an account? Login
+          </Text>
+        </TouchableOpacity>
+      </Card>
     </View>
   );
 }
