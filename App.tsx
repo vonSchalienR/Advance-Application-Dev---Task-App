@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./src/contexts/AuthContext";
 import { ThemeProvider, useThemeContext } from "./src/contexts/ThemeContext";
 import AuthStack from "./src/navigation/AuthStack";
+import { Provider as PaperProvider } from "react-native-paper";
 
 function RootNavigation() {
   const { theme } = useThemeContext();
@@ -17,9 +18,11 @@ function RootNavigation() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <RootNavigation />
-      </AuthProvider>
+      <PaperProvider>
+        <AuthProvider>
+          <RootNavigation />
+        </AuthProvider>
+      </PaperProvider>
     </ThemeProvider>
   );
 }
