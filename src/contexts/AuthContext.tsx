@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const session = await account.createEmailPasswordSession(email, password);
       const sessionId = session.$id;
 
+      // React Native has no cookies; set the session manually on the client.
       client.setSession(sessionId);
       setToken(sessionId);
       await SecureStore.setItemAsync(TOKEN_KEY, sessionId);
@@ -83,7 +84,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signup = async (email: string, password: string) => {
-    setLoading(true);
     try {
       await account.create(ID.unique(), email, password);
       await login(email, password);
