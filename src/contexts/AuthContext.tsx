@@ -45,20 +45,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
 
+  const setClientSession = (token: string) => {
+    client.setSession(token);
+    setToken(token);
+  };
+
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
       const session = await account.createEmailPasswordSession(email, password);
-      const sessionId = session.$id;
+      const sessionToken = session.secret || session.$id;
+      if (!sessionToken) {
+        throw new Error("No session token returned from Appwrite");
+      }
 
       // React Native has no cookies; set the session manually on the client.
-      client.setSession(sessionId);
-      setToken(sessionId);
-      await SecureStore.setItemAsync(TOKEN_KEY, sessionId);
+      setClientSession(sessionToken);
+      await SecureStore.setItemAsync(TOKEN_KEY, sessionToken);
 
       const currentUser = await account.get();
       setUser(currentUser);
     } catch (err) {
+      console.warn("[Auth] login failed", err);
       setUser(null);
       setToken(null);
       await SecureStore.deleteItemAsync(TOKEN_KEY);
@@ -84,6 +92,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signup = async (email: string, password: string) => {
+    setLoading(true);
     try {
       await account.create(ID.unique(), email, password);
       await login(email, password);
@@ -103,12 +112,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           return;
         }
 
-        client.setSession(storedToken);
-        setToken(storedToken);
+        setClientSession(storedToken);
 
         const currentUser = await account.get();
         setUser(currentUser);
-      } catch (_) {
+      } catch (e) {
+        console.warn("[Auth] restoreSession failed", e);
         setUser(null);
         setToken(null);
       } finally {

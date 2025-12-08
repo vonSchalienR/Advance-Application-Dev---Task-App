@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { databases, DB_ID, TASK_COLLECTION } from "../appwrite";
 import { useAuth } from "../contexts/AuthContext";
 import { Query } from "appwrite";
@@ -16,6 +17,7 @@ type Task = {
 };
 
 export default function HomeScreen() {
+  const navigation = useNavigation<any>();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -45,9 +47,7 @@ export default function HomeScreen() {
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => (
-          <TaskItem task={item} refresh={load} />
-        )}
+        renderItem={({ item }) => <TaskItem task={item} refresh={load} />}
         ListEmptyComponent={
           <View style={{ marginTop: spacing.xl }}>
             <Text style={[styles.subtitle, { textAlign: "center" }]}>
@@ -69,7 +69,7 @@ export default function HomeScreen() {
 
       {/* FLOATING ADD BUTTON */}
       <TouchableOpacity
-        onPress={() => console.log("Open add task screen")}
+        onPress={() => navigation.navigate("Add Task")}
         style={{
           position: "absolute",
           bottom: 30,
