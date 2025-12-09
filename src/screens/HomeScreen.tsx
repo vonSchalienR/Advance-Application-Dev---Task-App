@@ -48,7 +48,7 @@ export default function HomeScreen() {
       <View
         style={[
           styles.container,
-          { paddingBottom: Math.max(spacing.md, insets.bottom) },
+          { paddingBottom: Math.max(spacing.xl, insets.bottom + spacing.lg) },
         ]}
       >
         {/* HEADER */}
@@ -86,7 +86,7 @@ export default function HomeScreen() {
           onPress={() => navigation.navigate("Add Task")}
           style={{
             position: "absolute",
-            bottom: 30,
+            bottom: 88,
             right: 30,
             backgroundColor: colors.primary,
             width: scale(60),
