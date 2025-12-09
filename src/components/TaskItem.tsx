@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import {
   databases,
@@ -92,11 +92,18 @@ export default function TaskItem({ task, refresh }: Props) {
           backgroundColor: theme.colors.card,
           borderWidth: 1,
           borderColor: isDark ? theme.colors.border : "rgba(0,0,0,0.04)",
-          shadowColor: isDark ? "#000" : "#1A202C",
-          shadowOpacity: isDark ? 0.25 : 0.08,
-          shadowOffset: { width: 0, height: 4 },
-          shadowRadius: 10,
-          elevation: 3,
+          ...Platform.select({
+            ios: {
+              shadowColor: isDark ? "#000" : "#1A202C",
+              shadowOpacity: isDark ? 0.25 : 0.08,
+              shadowOffset: { width: 0, height: 4 },
+              shadowRadius: 10,
+            },
+            android: {
+              elevation: 3,
+            },
+            default: {},
+          }),
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
