@@ -13,6 +13,25 @@ export default function Tabs() {
         headerShown: true,
         tabBarActiveTintColor: "#ff7058",
         tabBarInactiveTintColor: "gray",
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 6,
+          position: "absolute",
+          left: 16,
+          right: 16,
+          bottom: 12,
+          borderRadius: 18,
+          backgroundColor: "#fff",
+          elevation: 6,
+          shadowColor: "#000",
+          shadowOpacity: 0.08,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 10,
+        },
+        tabBarLabelStyle: {
+          marginBottom: 2,
+        },
       }}
     >
       <Tab.Screen
@@ -30,7 +49,11 @@ export default function Tabs() {
         component={AddTaskScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="add-circle-outline" size={size} color={color} />
+            <MaterialIcons
+              name="add-circle-outline"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />

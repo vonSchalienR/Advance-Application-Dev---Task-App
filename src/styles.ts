@@ -1,4 +1,9 @@
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform, Dimensions } from "react-native";
+
+// Simple scaling helpers for responsive sizing
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const BASE_WIDTH = 375; // iPhone X reference
+export const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
 
 export const colors = {
   primary: "#5A67D8",
