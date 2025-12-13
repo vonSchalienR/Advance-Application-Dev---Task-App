@@ -142,6 +142,48 @@ export default function AddTaskScreen({ navigation }: any) {
             <Menu.Item title="High" onPress={() => onSelectPriority("high")} />
           </Menu>
 
+          {/* DUE DATE (simple) */}
+          <View style={{ marginTop: spacing.md }}>
+            <Text style={{ marginBottom: 8, color: theme.colors.text, fontSize: 16 }}>
+              Due date: {dueDate.toISOString().split("T")[0]}
+            </Text>
+
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Button
+                mode="outlined"
+                onPress={() => setDueDate(new Date())}
+                style={{ flex: 1 }}
+              >
+                Today
+              </Button>
+
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() + 1);
+                  setDueDate(d);
+                }}
+                style={{ flex: 1 }}
+              >
+                Tomorrow
+              </Button>
+
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  const d = new Date();
+                  d.setDate(d.getDate() + 7);
+                  setDueDate(d);
+                }}
+                style={{ flex: 1 }}
+              >
+                +7 days
+              </Button>
+            </View>
+          </View>
+
+
           <Button
             mode="contained"
             onPress={add}
