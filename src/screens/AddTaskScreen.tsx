@@ -43,10 +43,16 @@ export default function AddTaskScreen({ navigation }: any) {
 
       navigation.goBack();
     } catch (err: any) {
-      console.error("CREATE TASK ERROR:", err);
-      Alert.alert("Error", err?.message ?? "Failed to create task");
+      console.log("CREATE TASK ERROR RAW:", err);
+      console.log("CREATE TASK ERROR JSON:", JSON.stringify(err, null, 2));
+      console.log("CREATE TASK ERROR response:", err?.response);
+
+      Alert.alert(
+        "Error",
+        err?.message ?? err?.response?.message ?? "Failed to create task"
+      );
     }
-  };
+  }; 
 
   const onSelectPriority = (p: "low" | "medium" | "high") => {
     setPriority(p);
@@ -93,7 +99,7 @@ export default function AddTaskScreen({ navigation }: any) {
             left={<TextInput.Icon icon="format-title" />}
           />
 
-          {/* PRIORITY PICKER (fixed) */}
+          {/* PRIORITY PICKER */}
           <Menu
             visible={priorityMenuVisible}
             onDismiss={() => setPriorityMenuVisible(false)}
@@ -153,5 +159,4 @@ export default function AddTaskScreen({ navigation }: any) {
     </SafeAreaView>
   );
 }
-
 
