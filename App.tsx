@@ -1,6 +1,10 @@
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LogBox } from "react-native";
 
+LogBox.ignoreLogs([
+  "Invalid prop `index` supplied to `React.Fragment`",
+]);
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./src/contexts/AuthContext";
 import { ThemeProvider, useThemeContext } from "./src/contexts/ThemeContext";
