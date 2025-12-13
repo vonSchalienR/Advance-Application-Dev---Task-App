@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
-import { View, FlatList, Text, TouchableOpacity } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, FlatList, Text } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { databases, DB_ID, TASK_COLLECTION } from "../appwrite";
 import { useAuth } from "../contexts/AuthContext";
 import { Query } from "appwrite";
 import TaskItem from "../components/TaskItem";
 import { styles, colors, spacing, scale } from "../styles";
 import { MaterialIcons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Task = {
   $id: string;
@@ -26,19 +27,35 @@ export default function HomeScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const insets = useSafeAreaInsets();
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) return;
 
-    const res: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
-      Query.equal("userId", user.$id),
-    ]);
+    try {
+      console.log("[HOME] Using DB_ID:", DB_ID);
+      console.log("[HOME] Using TASK_COLLECTION:", TASK_COLLECTION);
+      console.log("[HOME] Loading tasks for userId:", user.$id);
 
-    setTasks(res.documents ?? []);
-  };
+      const res: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
+        Query.equal("userId", user.$id),
+      ]);
+
+      console.log("[HOME] Loaded documents:", res?.documents?.length ?? 0);
+      setTasks(res?.documents ?? []);
+    } catch (err: any) {
+      console.log("[HOME] LOAD ERROR:", err);
+      setTasks([]);
+    }
+  }, [user]);
 
   useEffect(() => {
     load();
-  }, [user]);
+  }, [load]);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load])
+  );
 
   return (
     <SafeAreaView
@@ -62,12 +79,13 @@ export default function HomeScreen() {
           data={tasks}
           keyExtractor={(item) => item.$id}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={() => navigation.navigate("TaskDetails", { taskId: item.$id })}
-            >
-              <TaskItem task={item} refresh={load} />
-            </TouchableOpacity>
+            <TaskItem
+              task={item}
+              refresh={load}
+              onPress={() =>
+                navigation.navigate("TaskDetails", { taskId: item.$id })
+              }
+            />
           )}
           ListEmptyComponent={
             <View style={{ marginTop: spacing.xl }}>
@@ -85,7 +103,7 @@ export default function HomeScreen() {
               </Text>
             </View>
           }
-          contentContainerStyle={{ paddingBottom: 80 }}
+          contentContainerStyle={{ paddingBottom: 120 }}
         />
 
         {/* FLOATING ADD BUTTON */}
@@ -114,3 +132,4 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
+
