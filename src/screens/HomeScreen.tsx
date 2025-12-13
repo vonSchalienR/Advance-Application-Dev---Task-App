@@ -61,7 +61,14 @@ export default function HomeScreen() {
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.$id}
-          renderItem={({ item }) => <TaskItem task={item} refresh={load} />}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("TaskDetails", { taskId: item.$id })}
+            >
+              <TaskItem task={item} refresh={load} />
+            </TouchableOpacity>
+          )}
           ListEmptyComponent={
             <View style={{ marginTop: spacing.xl }}>
               <Text style={[styles.subtitle, { textAlign: "center" }]}>
