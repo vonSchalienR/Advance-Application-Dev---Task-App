@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { View, TouchableOpacity, Alert } from "react-native";
+import { View, TouchableOpacity, Alert, Platform } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { TextInput, Button, Text, Card, Menu } from "react-native-paper";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { databases, DB_ID, TASK_COLLECTION } from "../appwrite";
 import { ID } from "appwrite";
 import { useAuth } from "../contexts/AuthContext";
 import { styles, colors, spacing, radius, scale } from "../styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useThemeContext } from "../contexts/ThemeContext";
+
+type Priority = "low" | "medium" | "high";
 
 export default function AddTaskScreen({ navigation }: any) {
   const { user } = useAuth();
@@ -21,8 +24,27 @@ export default function AddTaskScreen({ navigation }: any) {
 
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
-  const [priority, setPriority] = useState<"low" | "medium" | "high">("low");
+  const [priority, setPriority] = useState<Priority>("low");
+
   const [priorityMenuVisible, setPriorityMenuVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const formatDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const onSelectPriority = (p: Priority) => {
+    setPriority(p);
+    setPriorityMenuVisible(false);
+  };
+
+  const onPickDate = (_event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) setDueDate(selectedDate);
+  };
 
   const add = async () => {
     if (!title.trim()) {
@@ -31,14 +53,11 @@ export default function AddTaskScreen({ navigation }: any) {
     }
 
     try {
-      console.log("Using DB_ID:", DB_ID);
-      console.log("Using TASK_COLLECTION:", TASK_COLLECTION);
-
       await databases.createDocument(DB_ID, TASK_COLLECTION, ID.unique(), {
         title: title.trim(),
-        dueDate: dueDate.toISOString().split("T")[0],
+        dueDate: formatDate(dueDate),
         priority,
-        userId: user.$id,
+        userId: user.$id, 
       });
 
       navigation.goBack();
@@ -52,11 +71,6 @@ export default function AddTaskScreen({ navigation }: any) {
         err?.message ?? err?.response?.message ?? "Failed to create task"
       );
     }
-  }; 
-
-  const onSelectPriority = (p: "low" | "medium" | "high") => {
-    setPriority(p);
-    setPriorityMenuVisible(false);
   };
 
   return (
@@ -90,6 +104,7 @@ export default function AddTaskScreen({ navigation }: any) {
             },
           ]}
         >
+          {/* TITLE */}
           <TextInput
             mode="outlined"
             label="Task Title"
@@ -127,6 +142,7 @@ export default function AddTaskScreen({ navigation }: any) {
                     marginLeft: 10,
                     color: theme.colors.text,
                     fontSize: 16,
+                    textTransform: "capitalize",
                   }}
                 >
                   Priority: {priority}
@@ -142,48 +158,65 @@ export default function AddTaskScreen({ navigation }: any) {
             <Menu.Item title="High" onPress={() => onSelectPriority("high")} />
           </Menu>
 
-          {/* DUE DATE (simple) */}
-          <View style={{ marginTop: spacing.md }}>
-            <Text style={{ marginBottom: 8, color: theme.colors.text, fontSize: 16 }}>
-              Due date: {dueDate.toISOString().split("T")[0]}
+          {/* DUE DATE PICKER */}
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            activeOpacity={0.85}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              borderWidth: 1,
+              borderColor: colors.border,
+              padding: spacing.md,
+              borderRadius: radius.lg,
+              backgroundColor: theme.colors.card,
+              marginTop: spacing.md,
+            }}
+          >
+            <MaterialIcons
+              name="calendar-today"
+              size={22}
+              color={theme.colors.primary}
+            />
+            <Text
+              style={{ marginLeft: 10, color: theme.colors.text, fontSize: 16 }}
+            >
+              Due date: {formatDate(dueDate)}
             </Text>
+          </TouchableOpacity>
 
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Button
-                mode="outlined"
-                onPress={() => setDueDate(new Date())}
-                style={{ flex: 1 }}
-              >
-                Today
-              </Button>
+          {showDatePicker && (
+            <DateTimePicker
+              value={dueDate}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={onPickDate}
+            />
+          )}
 
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  const d = new Date();
-                  d.setDate(d.getDate() + 1);
-                  setDueDate(d);
-                }}
-                style={{ flex: 1 }}
-              >
-                Tomorrow
-              </Button>
+          <View style={{ flexDirection: "row", gap: 10, marginTop: spacing.md }}>
+            <Button
+              mode="outlined"
+              onPress={() => setDueDate(new Date())}
+              style={{ flex: 1 }}
+            >
+              Today
+            </Button>
 
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  const d = new Date();
-                  d.setDate(d.getDate() + 7);
-                  setDueDate(d);
-                }}
-                style={{ flex: 1 }}
-              >
-                +7 days
-              </Button>
-            </View>
+            <Button
+              mode="outlined"
+              onPress={() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 1);
+                setDueDate(d);
+              }}
+              style={{ flex: 1 }}
+            >
+              Tomorrow
+            </Button>
           </View>
 
-
+          {/* SAVE */}
           <Button
             mode="contained"
             onPress={add}
@@ -201,4 +234,6 @@ export default function AddTaskScreen({ navigation }: any) {
     </SafeAreaView>
   );
 }
+
+
 

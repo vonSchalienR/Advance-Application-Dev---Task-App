@@ -1,23 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, FlatList, Text } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { View, FlatList, Text, Platform } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { databases, DB_ID, TASK_COLLECTION } from "../appwrite";
+import {
+  databases,
+  DB_ID,
+  TASK_COLLECTION,
+  COMPLETIONS_COLLECTION,
+} from "../appwrite";
 import { useAuth } from "../contexts/AuthContext";
 import { Query } from "appwrite";
 import TaskItem from "../components/TaskItem";
 import { styles, colors, spacing, scale } from "../styles";
 import { MaterialIcons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { RectButton } from "react-native-gesture-handler";
 
 type Task = {
   $id: string;
   title: string;
   dueDate: string;
-  priority: string;
+  priority: "low" | "medium" | "high";
   userId: string;
 };
 
@@ -25,27 +27,54 @@ export default function HomeScreen() {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
+
+  const sortTasks = useCallback((docs: any[]): Task[] => {
+    const weight: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
+    return (docs ?? [])
+      .slice()
+      .sort((a: any, b: any) => {
+        const pa = weight[String(a.priority)] ?? 99;
+        const pb = weight[String(b.priority)] ?? 99;
+        if (pa !== pb) return pa - pb;
+        return String(a.dueDate).localeCompare(String(b.dueDate));
+      });
+  }, []);
 
   const load = useCallback(async () => {
     if (!user) return;
 
+    setLoading(true);
     try {
-      console.log("[HOME] Using DB_ID:", DB_ID);
-      console.log("[HOME] Using TASK_COLLECTION:", TASK_COLLECTION);
-      console.log("[HOME] Loading tasks for userId:", user.$id);
-
-      const res: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
+      const taskRes: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
         Query.equal("userId", user.$id),
+        Query.orderAsc("dueDate"),
+        Query.limit(1000),
       ]);
 
-      console.log("[HOME] Loaded documents:", res?.documents?.length ?? 0);
-      setTasks(res?.documents ?? []);
-    } catch (err: any) {
+      const compRes: any = await databases.listDocuments(
+        DB_ID,
+        COMPLETIONS_COLLECTION,
+        [Query.equal("userId", user.$id), Query.limit(1000)]
+      );
+
+      const taskDocs = taskRes?.documents ?? [];
+      const compDocs = compRes?.documents ?? [];
+
+      const completedSet = new Set<string>(compDocs.map((c: any) => String(c.taskId)));
+
+      const activeTasks = taskDocs.filter((t: any) => !completedSet.has(String(t.$id)));
+
+      setTasks(sortTasks(activeTasks));
+    } catch (err) {
       console.log("[HOME] LOAD ERROR:", err);
       setTasks([]);
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, sortTasks]);
 
   useEffect(() => {
     load();
@@ -57,6 +86,11 @@ export default function HomeScreen() {
     }, [load])
   );
 
+  const headerSubtitle = useMemo(() => {
+    const n = tasks.length;
+    return `${n} task${n !== 1 ? "s" : ""} waiting for you`;
+  }, [tasks.length]);
+
   return (
     <SafeAreaView
       style={{ flex: 1, paddingTop: insets.top || spacing.md }}
@@ -65,26 +99,27 @@ export default function HomeScreen() {
       <View
         style={[
           styles.container,
-          { paddingBottom: Math.max(spacing.xl, insets.bottom + spacing.lg) },
+          {
+            paddingTop: spacing.md,
+            paddingBottom: Math.max(spacing.xl, insets.bottom + spacing.lg),
+          },
         ]}
       >
-        {/* HEADER */}
-        <Text style={styles.title}>Today’s Tasks</Text>
-        <Text style={styles.subtitle}>
-          {tasks.length} task{tasks.length !== 1 ? "s" : ""} waiting for you
-        </Text>
+        <View style={{ marginBottom: spacing.md }}>
+          <Text style={styles.title}>Today’s Tasks</Text>
+          <Text style={styles.subtitle}>{headerSubtitle}</Text>
+        </View>
 
-        {/* LIST */}
         <FlatList
           data={tasks}
           keyExtractor={(item) => item.$id}
+          onRefresh={load}
+          refreshing={loading}
           renderItem={({ item }) => (
             <TaskItem
               task={item}
               refresh={load}
-              onPress={() =>
-                navigation.navigate("TaskDetails", { taskId: item.$id })
-              }
+              onOpen={() => navigation.navigate("TaskDetails", { taskId: item.$id })}
             />
           )}
           ListEmptyComponent={
@@ -106,28 +141,32 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingBottom: 120 }}
         />
 
-        {/* FLOATING ADD BUTTON */}
-        <TouchableOpacity
+        <RectButton
           onPress={() => navigation.navigate("Add Task")}
           style={{
             position: "absolute",
             bottom: 88,
-            right: 30,
+            right: 24,
             backgroundColor: colors.primary,
             width: scale(60),
             height: scale(60),
             borderRadius: scale(30),
             justifyContent: "center",
             alignItems: "center",
-            shadowColor: "#000",
-            shadowOpacity: 0.3,
-            shadowOffset: { width: 0, height: 4 },
-            shadowRadius: 8,
-            elevation: 6,
+            ...Platform.select({
+              ios: {
+                shadowColor: "#000",
+                shadowOpacity: 0.25,
+                shadowOffset: { width: 0, height: 4 },
+                shadowRadius: 10,
+              },
+              android: { elevation: 7 },
+              default: {},
+            }),
           }}
         >
           <MaterialIcons name="add" size={32} color="#fff" />
-        </TouchableOpacity>
+        </RectButton>
       </View>
     </SafeAreaView>
   );
