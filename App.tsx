@@ -1,4 +1,10 @@
 import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "Invalid prop `index` supplied to `React.Fragment`",
+]);
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./src/contexts/AuthContext";
 import { ThemeProvider, useThemeContext } from "./src/contexts/ThemeContext";
@@ -20,14 +26,17 @@ function RootNavigation() {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <PaperProvider>
-          <AuthProvider>
-            <RootNavigation />
-          </AuthProvider>
-        </PaperProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PaperProvider>
+            <AuthProvider>
+              <RootNavigation />
+            </AuthProvider>
+          </PaperProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
+
