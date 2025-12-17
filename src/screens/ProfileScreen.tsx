@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { View, Alert } from "react-native";
+import { View, Alert, Image } from "react-native";
 import { Text, Button, Card, Switch } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import { Query } from "appwrite";
+
 import { useAuth } from "../contexts/AuthContext";
 import { useThemeContext } from "../contexts/ThemeContext";
 import { styles, colors, spacing, radius } from "../styles";
@@ -10,7 +13,6 @@ import {
   TASK_COLLECTION,
   COMPLETIONS_COLLECTION,
 } from "../appwrite";
-import { Query } from "appwrite";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -20,9 +22,33 @@ export default function ProfileScreen() {
   const [completedCount, setCompletedCount] = useState<number | null>(null);
   const [loadingStats, setLoadingStats] = useState(false);
 
+
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
   if (!user) return null;
 
   const initial = user.email?.[0]?.toUpperCase() ?? "U";
+
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Gallery access is needed");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
 
   const loadStats = useCallback(async () => {
     if (!user?.$id) return;
@@ -55,16 +81,13 @@ export default function ProfileScreen() {
       setCompletedCount(completedSet.size);
       setActiveCount(active);
     } catch (e: any) {
-      console.log("[PROFILE] stats error RAW:", e);
-      console.log("[PROFILE] stats error JSON:", JSON.stringify(e, null, 2));
-      console.log("[PROFILE] stats error response:", e?.response);
-
+      console.log("[PROFILE] stats error:", e);
       setActiveCount(null);
       setCompletedCount(null);
 
       Alert.alert(
         "Error",
-        e?.message ?? e?.response?.message ?? "Failed to load statistics"
+        e?.message ?? "Failed to load statistics"
       );
     } finally {
       setLoadingStats(false);
@@ -77,27 +100,36 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { padding: spacing.lg }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>Profile</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        Profile
+      </Text>
 
       <Card
         style={[styles.elevatedCard, { backgroundColor: theme.colors.card }]}
       >
+
         <View style={{ alignItems: "center", marginBottom: spacing.lg }}>
-          <View
+          <Image
+            source={
+              imageUri
+                ? { uri: imageUri }
+                : require("../../assets/default-avatar.jpg")
+            }
             style={{
-              width: 90,
-              height: 90,
-              borderRadius: 45,
-              backgroundColor: colors.primary,
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: spacing.md,
+              width: 96,
+              height: 96,
+              borderRadius: 48,
+              marginBottom: spacing.sm,
             }}
+          />
+
+          <Button
+            mode="outlined"
+            onPress={pickImage}
+            style={{ marginBottom: spacing.md }}
           >
-            <Text style={{ fontSize: 36, color: "#fff", fontWeight: "700" }}>
-              {initial}
-            </Text>
-          </View>
+            Change profile picture
+          </Button>
 
           <Text
             style={{
@@ -108,10 +140,12 @@ export default function ProfileScreen() {
           >
             {user.email}
           </Text>
+
           <Text style={{ color: theme.colors.text, marginTop: 4 }}>
             Logged in user
           </Text>
         </View>
+
 
         <View
           style={{
