@@ -8,6 +8,7 @@ import React, {
 import { ID } from "appwrite";
 import { account, client } from "../appwrite";
 import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 type AppwriteUser = {
   $id: string;
@@ -40,6 +41,32 @@ type AuthProviderProps = {
 
 const TOKEN_KEY = "authToken";
 
+const isWeb = Platform.OS === "web";
+
+const setTokenSecure = (key: string, value: string) => {
+  if (isWeb) {
+    localStorage.setItem(key, value);
+    return Promise.resolve();
+  }
+  return SecureStore.setItemAsync(key, value);
+};
+
+const getTokenSecure = (key: string) => {
+  if (isWeb) {
+    const v = localStorage.getItem(key);
+    return Promise.resolve(v);
+  }
+  return SecureStore.getItemAsync(key);
+};
+
+const deleteTokenSecure = (key: string) => {
+  if (isWeb) {
+    localStorage.removeItem(key);
+    return Promise.resolve();
+  }
+  return SecureStore.deleteItemAsync(key);
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AppwriteUser>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +88,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // React Native has no cookies; set the session manually on the client.
       setClientSession(sessionToken);
-      await SecureStore.setItemAsync(TOKEN_KEY, sessionToken);
+      await setTokenSecure(TOKEN_KEY, sessionToken);
 
       const currentUser = await account.get();
       setUser(currentUser);
@@ -69,7 +96,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.warn("[Auth] login failed", err);
       setUser(null);
       setToken(null);
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await deleteTokenSecure(TOKEN_KEY);
       throw err;
     } finally {
       setLoading(false);
@@ -86,7 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       client.setSession("");
       setToken(null);
       setUser(null);
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await deleteTokenSecure(TOKEN_KEY);
       setLoading(false);
     }
   };
@@ -105,7 +132,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const restoreSession = async () => {
       setLoading(true);
       try {
-        const storedToken = await SecureStore.getItemAsync(TOKEN_KEY);
+        const storedToken = await getTokenSecure(TOKEN_KEY);
         if (!storedToken) {
           setUser(null);
           setToken(null);
