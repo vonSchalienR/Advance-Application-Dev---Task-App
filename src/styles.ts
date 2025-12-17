@@ -1,8 +1,8 @@
 import { StyleSheet, Platform, Dimensions } from "react-native";
 
-// Simple scaling helpers for responsive sizing
+
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const BASE_WIDTH = 375; // iPhone X reference
+const BASE_WIDTH = 375; 
 export const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
 
 export const colors = {
@@ -34,7 +34,7 @@ export const radius = {
 };
 
 export const styles = StyleSheet.create({
-  // ===== Layout Containers =====
+
 
  container: {
   flex: 1,
@@ -60,7 +60,6 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
-  // ===== Typography =====
 
   title: {
     fontSize: 26,
@@ -90,7 +89,6 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // ===== Cards =====
 
   card: {
     backgroundColor: colors.cardBackground,
@@ -115,7 +113,6 @@ export const styles = StyleSheet.create({
     elevation: 6,
   },
 
-  // ===== Inputs =====
 
   input: {
     marginBottom: spacing.md,
@@ -128,7 +125,6 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
 
-  // ===== Buttons =====
 
   primaryButton: {
     marginTop: spacing.lg,
@@ -143,7 +139,6 @@ export const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
 
-  // ===== Spacing Utilities =====
 
   mtSm: { marginTop: spacing.sm },
   mtMd: { marginTop: spacing.md },
@@ -153,7 +148,6 @@ export const styles = StyleSheet.create({
   mbMd: { marginBottom: spacing.md },
   mbLg: { marginBottom: spacing.lg },
 
-  // ===== Avatar/Profile =====
 
   avatar: {
     width: 80,
@@ -164,7 +158,6 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
 
-  // ===== Task-specific Styles =====
 
   taskContainer: {
     padding: spacing.md,
@@ -183,7 +176,6 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
 
-  // ===== Animations Defaults =====
 
   fadeIn: {
     opacity: 0,

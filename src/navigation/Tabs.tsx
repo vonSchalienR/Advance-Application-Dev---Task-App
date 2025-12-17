@@ -10,13 +10,15 @@ export default function Tabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         tabBarActiveTintColor: "#ff7058",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: {
           height: 60,
+          width: 380,
           paddingBottom: 8,
           paddingTop: 6,
+          marginHorizontal: 16,
           position: "absolute",
           left: 16,
           right: 16,
