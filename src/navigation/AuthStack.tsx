@@ -23,10 +23,10 @@ export default function AuthStack() {
       {user ? (
         <Stack.Screen name="App" component={AppStack} />
       ) : (
-        <>
+        <Stack.Group>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-        </>
+        </Stack.Group>
       )}
     </Stack.Navigator>
   );

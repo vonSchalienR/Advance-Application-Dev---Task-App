@@ -29,11 +29,11 @@ export default function ProfileScreen() {
 
     setLoadingStats(true);
     try {
-
-      const tasksRes: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
-        Query.equal("userId", user.$id),
-        Query.limit(1000),
-      ]);
+      const tasksRes: any = await databases.listDocuments(
+        DB_ID,
+        TASK_COLLECTION,
+        [Query.equal("userId", user.$id), Query.limit(1000)]
+      );
 
       const compsRes: any = await databases.listDocuments(
         DB_ID,
@@ -48,7 +48,9 @@ export default function ProfileScreen() {
         completions.map((c: any) => String(c.taskId))
       );
 
-      const active = tasks.filter((t: any) => !completedSet.has(String(t.$id))).length;
+      const active = tasks.filter(
+        (t: any) => !completedSet.has(String(t.$id))
+      ).length;
 
       setCompletedCount(completedSet.size);
       setActiveCount(active);
@@ -75,9 +77,11 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { padding: spacing.lg }]}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>Profile</Text>
 
-      <Card style={[styles.elevatedCard, { backgroundColor: theme.colors.card }]}>
+      <Card
+        style={[styles.elevatedCard, { backgroundColor: theme.colors.card }]}
+      >
         <View style={{ alignItems: "center", marginBottom: spacing.lg }}>
           <View
             style={{
@@ -95,8 +99,16 @@ export default function ProfileScreen() {
             </Text>
           </View>
 
-          <Text style={{ fontSize: 20, fontWeight: "600" }}>{user.email}</Text>
-          <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "600",
+              color: theme.colors.text,
+            }}
+          >
+            {user.email}
+          </Text>
+          <Text style={{ color: theme.colors.text, marginTop: 4 }}>
             Logged in user
           </Text>
         </View>
@@ -109,23 +121,31 @@ export default function ProfileScreen() {
             marginBottom: spacing.md,
           }}
         >
-          <Text style={{ fontSize: 16 }}>Dark Mode</Text>
+          <Text style={{ fontSize: 16, color: theme.colors.text }}>
+            Dark Mode
+          </Text>
           <Switch value={isDark} onValueChange={toggleTheme} />
         </View>
 
         <View style={{ marginTop: spacing.md }}>
-          <Text style={styles.subtitle}>Statistics</Text>
+          <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+            Statistics
+          </Text>
 
           <View style={[styles.rowBetween, { marginBottom: spacing.sm }]}>
-            <Text style={styles.paragraph}>Completed tasks</Text>
-            <Text style={{ fontWeight: "600" }}>
+            <Text style={[styles.paragraph, { color: theme.colors.text }]}>
+              Completed tasks
+            </Text>
+            <Text style={{ fontWeight: "600", color: theme.colors.text }}>
               {loadingStats ? "…" : completedCount ?? "—"}
             </Text>
           </View>
 
           <View style={[styles.rowBetween, { marginBottom: spacing.sm }]}>
-            <Text style={styles.paragraph}>Active tasks</Text>
-            <Text style={{ fontWeight: "600" }}>
+            <Text style={[styles.paragraph, { color: theme.colors.text }]}>
+              Active tasks
+            </Text>
+            <Text style={{ fontWeight: "600", color: theme.colors.text }}>
               {loadingStats ? "…" : activeCount ?? "—"}
             </Text>
           </View>
@@ -156,4 +176,3 @@ export default function ProfileScreen() {
     </View>
   );
 }
-
