@@ -2,11 +2,13 @@ import { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { TextInput, Button, Text, Card } from "react-native-paper";
 import { useAuth } from "../contexts/AuthContext";
+import { useThemeContext } from "../contexts/ThemeContext";
 import { styles, colors, spacing, radius } from "../styles";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function RegisterScreen({ navigation }: any) {
   const { signup } = useAuth();
+  const { theme } = useThemeContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,15 +23,23 @@ export default function RegisterScreen({ navigation }: any) {
 
   return (
     <View style={[styles.container, { justifyContent: "center" }]}>
-      
       {/* HERO TITLE */}
-      <Text style={[styles.title, { textAlign: "center", marginBottom: spacing.lg }]}>
+      <Text
+        style={[
+          styles.title,
+          {
+            textAlign: "center",
+            marginBottom: spacing.lg,
+            color: theme.colors.text,
+          },
+        ]}
+      >
         Create Account
       </Text>
       <Text
         style={{
           textAlign: "center",
-          color: colors.textSecondary,
+          color: theme.colors.text,
           marginBottom: spacing.lg,
         }}
       >

@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { View, FlatList, Text, Platform } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   databases,
@@ -9,6 +12,7 @@ import {
   COMPLETIONS_COLLECTION,
 } from "../appwrite";
 import { useAuth } from "../contexts/AuthContext";
+import { useThemeContext } from "../contexts/ThemeContext";
 import { Query } from "appwrite";
 import TaskItem from "../components/TaskItem";
 import { styles, colors, spacing, scale } from "../styles";
@@ -26,6 +30,7 @@ type Task = {
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
+  const { theme } = useThemeContext();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
@@ -33,14 +38,12 @@ export default function HomeScreen() {
   const sortTasks = useCallback((docs: any[]): Task[] => {
     const weight: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
-    return (docs ?? [])
-      .slice()
-      .sort((a: any, b: any) => {
-        const pa = weight[String(a.priority)] ?? 99;
-        const pb = weight[String(b.priority)] ?? 99;
-        if (pa !== pb) return pa - pb;
-        return String(a.dueDate).localeCompare(String(b.dueDate));
-      });
+    return (docs ?? []).slice().sort((a: any, b: any) => {
+      const pa = weight[String(a.priority)] ?? 99;
+      const pb = weight[String(b.priority)] ?? 99;
+      if (pa !== pb) return pa - pb;
+      return String(a.dueDate).localeCompare(String(b.dueDate));
+    });
   }, []);
 
   const load = useCallback(async () => {
@@ -48,11 +51,15 @@ export default function HomeScreen() {
 
     setLoading(true);
     try {
-      const taskRes: any = await databases.listDocuments(DB_ID, TASK_COLLECTION, [
-        Query.equal("userId", user.$id),
-        Query.orderAsc("dueDate"),
-        Query.limit(1000),
-      ]);
+      const taskRes: any = await databases.listDocuments(
+        DB_ID,
+        TASK_COLLECTION,
+        [
+          Query.equal("userId", user.$id),
+          Query.orderAsc("dueDate"),
+          Query.limit(1000),
+        ]
+      );
 
       const compRes: any = await databases.listDocuments(
         DB_ID,
@@ -63,9 +70,13 @@ export default function HomeScreen() {
       const taskDocs = taskRes?.documents ?? [];
       const compDocs = compRes?.documents ?? [];
 
-      const completedSet = new Set<string>(compDocs.map((c: any) => String(c.taskId)));
+      const completedSet = new Set<string>(
+        compDocs.map((c: any) => String(c.taskId))
+      );
 
-      const activeTasks = taskDocs.filter((t: any) => !completedSet.has(String(t.$id)));
+      const activeTasks = taskDocs.filter(
+        (t: any) => !completedSet.has(String(t.$id))
+      );
 
       setTasks(sortTasks(activeTasks));
     } catch (err) {
@@ -93,7 +104,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, paddingTop: insets.top || spacing.md }}
+      style={{
+        flex: 1,
+        paddingTop: insets.top || spacing.md,
+        backgroundColor: theme.colors.background,
+      }}
       edges={["top", "left", "right"]}
     >
       <View
@@ -102,13 +117,17 @@ export default function HomeScreen() {
           {
             paddingTop: spacing.md,
             paddingBottom: Math.max(spacing.xl, insets.bottom + spacing.lg),
+            backgroundColor: theme.colors.background,
           },
         ]}
       >
-        <View style={{ marginBottom: spacing.md }}>
-          <Text style={styles.title}>Today’s Tasks</Text>
-          <Text style={styles.subtitle}>{headerSubtitle}</Text>
-        </View>
+        {/* HEADER */}
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          Today’s Tasks
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+          {tasks.length} task{tasks.length !== 1 ? "s" : ""} waiting for you
+        </Text>
 
         <FlatList
           data={tasks}
@@ -119,18 +138,25 @@ export default function HomeScreen() {
             <TaskItem
               task={item}
               refresh={load}
-              onOpen={() => navigation.navigate("TaskDetails", { taskId: item.$id })}
+              onOpen={() =>
+                navigation.navigate("TaskDetails", { taskId: item.$id })
+              }
             />
           )}
           ListEmptyComponent={
             <View style={{ marginTop: spacing.xl }}>
-              <Text style={[styles.subtitle, { textAlign: "center" }]}>
+              <Text
+                style={[
+                  styles.subtitle,
+                  { textAlign: "center", color: theme.colors.text },
+                ]}
+              >
                 No tasks yet
               </Text>
               <Text
                 style={{
                   textAlign: "center",
-                  color: colors.textSecondary,
+                  color: theme.colors.text,
                   marginTop: 8,
                 }}
               >
@@ -171,4 +197,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   );
 }
-
