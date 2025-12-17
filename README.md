@@ -57,7 +57,7 @@ These features were submitted to and approved by the instructor before implement
 - Appwrite Cloud (Authentication, Database)
 
 ### **Native Features**
-- Expo ImagePicker (camera & gallery)
+- Expo ImagePicker (gallery)
 - Gesture Handler
 
 ---
@@ -109,10 +109,9 @@ TaskApp supports **light and dark themes**, including:
 
 ---
 
-## 📸 Camera & Image Upload
+## 📸 Image Upload
 The user can upload a profile picture using:
-
-- Device camera  
+ 
 - Device gallery  
 
 Built using **Expo ImagePicker**.
