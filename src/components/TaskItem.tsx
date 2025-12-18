@@ -24,7 +24,7 @@ type Task = {
 type Props = {
   task: Task;
   refresh: () => void;
-  onOpen?: () => void; 
+  onOpen?: () => void;
 };
 
 export default function TaskItem({ task, refresh, onOpen }: Props) {
@@ -81,8 +81,10 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
     try {
       const completedAt = new Date().toISOString().slice(0, 10);
 
-
-      const completionId = `${task.$id.slice(0, 18)}_${task.userId.slice(0, 17)}`;
+      const completionId = `${task.$id.slice(0, 18)}_${task.userId.slice(
+        0,
+        17
+      )}`;
 
       await databases.createDocument(
         DB_ID,
@@ -117,21 +119,9 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
   return (
     <Swipeable
       renderLeftActions={() => (
-        <View style={{ justifyContent: "center", paddingHorizontal: spacing.md }}>
-          <Button
-            icon="check-circle"
-            mode="contained"
-            buttonColor={colors.success}
-            onPress={complete}
-            disabled={isCompleting || isDeleting}
-            loading={isCompleting}
-          >
-            Done
-          </Button>
-        </View>
-      )}
-      renderRightActions={() => (
-        <View style={{ justifyContent: "center", paddingHorizontal: spacing.md }}>
+        <View
+          style={{ justifyContent: "center", paddingHorizontal: spacing.md }}
+        >
           <Button
             icon="delete"
             mode="contained"
@@ -144,8 +134,23 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
           </Button>
         </View>
       )}
+      renderRightActions={() => (
+        <View
+          style={{ justifyContent: "center", paddingHorizontal: spacing.md }}
+        >
+          <Button
+            icon="check-circle"
+            mode="contained"
+            buttonColor={colors.success}
+            onPress={complete}
+            disabled={isCompleting || isDeleting}
+            loading={isCompleting}
+          >
+            Done
+          </Button>
+        </View>
+      )}
     >
-
       <RectButton
         onPress={onOpen}
         enabled={!!onOpen && !isCompleting && !isDeleting}
@@ -173,7 +178,6 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-
             <RectButton
               onPress={complete}
               enabled={!isCompleting && !isDeleting}
@@ -188,7 +192,9 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
                   width: 42,
                   height: 42,
                   borderRadius: 14,
-                  backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#EEF2FF",
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "#EEF2FF",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
@@ -214,7 +220,11 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
               </Text>
 
               <View
-                style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 6,
+                }}
               >
                 <MaterialIcons
                   name="calendar-today"
@@ -223,7 +233,11 @@ export default function TaskItem({ task, refresh, onOpen }: Props) {
                   style={{ marginRight: 6 }}
                 />
                 <Text
-                  style={{ color: theme.colors.text, opacity: 0.75, fontSize: 13 }}
+                  style={{
+                    color: theme.colors.text,
+                    opacity: 0.75,
+                    fontSize: 13,
+                  }}
                 >
                   Due {task.dueDate}
                 </Text>
