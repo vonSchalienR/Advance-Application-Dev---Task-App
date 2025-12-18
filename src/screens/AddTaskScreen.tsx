@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { styles, colors, spacing, radius, scale } from "../styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useThemeContext } from "../contexts/ThemeContext";
+import { scheduleTaskReminder } from "../notifications";
 
 type Priority = "low" | "medium" | "high";
 
@@ -53,12 +54,30 @@ export default function AddTaskScreen({ navigation }: any) {
     }
 
     try {
-      await databases.createDocument(DB_ID, TASK_COLLECTION, ID.unique(), {
-        title: title.trim(),
-        dueDate: formatDate(dueDate),
-        priority,
-        userId: user.$id, 
-      });
+      const dueDateStr = formatDate(dueDate);
+
+      const doc: any = await databases.createDocument(
+        DB_ID,
+        TASK_COLLECTION,
+        ID.unique(),
+        {
+          title: title.trim(),
+          dueDate: dueDateStr,
+          priority,
+          userId: user.$id,
+        }
+      );
+
+      try {
+        await scheduleTaskReminder({
+          taskId: doc.$id,
+          userId: user.$id,
+          title: doc.title,
+          dueDate: dueDateStr,
+        });
+      } catch (err) {
+        console.warn("[AddTask] schedule reminder failed", err);
+      }
 
       navigation.goBack();
     } catch (err: any) {
@@ -194,7 +213,9 @@ export default function AddTaskScreen({ navigation }: any) {
             />
           )}
 
-          <View style={{ flexDirection: "row", gap: 10, marginTop: spacing.md }}>
+          <View
+            style={{ flexDirection: "row", gap: 10, marginTop: spacing.md }}
+          >
             <Button
               mode="outlined"
               onPress={() => setDueDate(new Date())}
@@ -234,6 +255,3 @@ export default function AddTaskScreen({ navigation }: any) {
     </SafeAreaView>
   );
 }
-
-
-
