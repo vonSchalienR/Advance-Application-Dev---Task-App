@@ -3,6 +3,7 @@
     "name": "taskapp",
     "slug": "taskapp",
     "version": "1.0.0",
+    "scheme": "taskapp",
     "orientation": "portrait",
     "icon": "./assets/todoicon.png",
     "userInterfaceStyle": "light",
@@ -13,7 +14,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.taskapp.app",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,11 +25,20 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "useNextNotificationsApi": true
+      "package": "com.taskapp.app",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-notifications"]
+    "plugins": [
+      "expo-notifications",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f37460a5-0691-4390-8296-e5a7e9c37114"
+      }
+    }
   }
 }
